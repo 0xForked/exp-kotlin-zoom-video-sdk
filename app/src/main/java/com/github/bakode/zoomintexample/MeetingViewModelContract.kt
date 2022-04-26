@@ -1,5 +1,6 @@
 package com.github.bakode.zoomintexample
 
-interface MeetingViewModelContract {
-
+interface MeetingViewModelContract
+{
+    // INTERACTOR
 }

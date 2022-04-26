@@ -20,5 +20,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "ZoomINTExample"
 include ':app'
-include ':commonlib'
 include ':mobilertc'

@@ -10,21 +10,33 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
-class MeetingActivity : AppCompatActivity(), View.OnTouchListener {
-    companion object {
+class MeetingActivity : AppCompatActivity(), View.OnTouchListener
+{
+    companion object
+    {
         val TAG: String = MeetingActivity::class.simpleName as String
 
-        var muteStatus: Boolean = false
+        var isMicrophoneMuted: Boolean = false
 
         var secondaryVideoContainerXPos = 0f
         var secondaryVideoContainerYPos = 0f
         var secondaryVideoLastAction = 0
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?)
+    {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_meeting)
+    }
 
+    override fun onStart()
+    {
+        super.onStart()
+        this.initViewListener()
+    }
+
+    private fun initViewListener()
+    {
         findViewById<FloatingActionButton>(R.id.fabFinishActivity)
             .setOnClickListener { this.finish() }
 
@@ -41,28 +53,35 @@ class MeetingActivity : AppCompatActivity(), View.OnTouchListener {
             .setOnTouchListener(this)
     }
 
-    private fun onMicrophoneMuted(view: FloatingActionButton) {
-        muteStatus = !muteStatus
+    private fun onMicrophoneMuted(view: FloatingActionButton)
+    {
+        isMicrophoneMuted = !isMicrophoneMuted
 
-        val micOn = ContextCompat.getDrawable(this, R.drawable.ic_baseline_mic_none)
-        val micOff = ContextCompat.getDrawable(this, R.drawable.ic_baseline_mic_off)
-        val icon: () -> Drawable = { if (muteStatus) micOn as Drawable else micOff as Drawable }
+        val micOnIcon = ContextCompat.getDrawable(
+            this, R.drawable.ic_baseline_mic_none)
+        val micOffIcon = ContextCompat.getDrawable(
+            this, R.drawable.ic_baseline_mic_off)
+        val getMicrophoneStatusIcon: () -> Drawable = {
+            if (isMicrophoneMuted) micOnIcon as Drawable
+            else micOffIcon as Drawable
+        }
 
-        view.setImageDrawable(icon())
-
-        Log.d(TAG, "MUTE_MICROPHONE $muteStatus")
+        view.setImageDrawable(getMicrophoneStatusIcon())
     }
 
-    private fun onMeetingDismissed() {
+    private fun onMeetingDismissed()
+    {
         Log.d(TAG, "CALL_DISMISSED")
     }
 
-    private fun onVideoFrameSwitched() {
+    private fun onVideoFrameSwitched()
+    {
         Log.d(TAG, "FRAME_SWITCHED")
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    override fun onTouch(view: View, event: MotionEvent): Boolean {
+    override fun onTouch(view: View, event: MotionEvent): Boolean
+    {
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
                 secondaryVideoContainerXPos = view.x - event.rawX
@@ -86,5 +105,10 @@ class MeetingActivity : AppCompatActivity(), View.OnTouchListener {
         }
 
         return true
+    }
+
+    override fun onDestroy()
+    {
+        super.onDestroy()
     }
 }
