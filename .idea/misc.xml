@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="app/src/main/res/drawable/badge_shape.xml" value="0.32" />
+        <entry key="app/src/main/res/drawable/ic_baseline_call.xml" value="0.178" />
+        <entry key="app/src/main/res/drawable/ic_baseline_chevron_left.xml" value="0.178" />
+        <entry key="app/src/main/res/drawable/ic_baseline_mic_none.xml" value="0.32" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/activity_meeting.xml" value="0.33" />
+        <entry key="mobilertc/build/.transforms/ba6b9d28560149b2ce9d683a7653b2b8/transformed/jetified-mobilertc/res/drawable/btn_switch_camera.xml" value="0.298" />
+        <entry key="mobilertc/build/.transforms/ba6b9d28560149b2ce9d683a7653b2b8/transformed/jetified-mobilertc/res/drawable/zm_btn_switch_camera.xml" value="0.298" />
+        <entry key="mobilertc/build/.transforms/ba6b9d28560149b2ce9d683a7653b2b8/transformed/jetified-mobilertc/res/drawable/zm_call.xml" value="0.178" />
+      </map>
+    </option>
+  </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="11" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>

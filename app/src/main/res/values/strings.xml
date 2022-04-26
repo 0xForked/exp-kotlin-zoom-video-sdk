@@ -1,3 +1,8 @@
 <resources>
-    <string name="app_name">ZoomINTExample</string>
+    <string name="app_name">Zoom Exp</string>
+    <string name="new_meeting">New Meeting</string>
+    <string name="welcome_to_zoom_meeting">Welcome to Zoom Meeting</string>
+    <string name="back">BACK</string>
+    <string name="doctor_placeholder">dr. Sumarto Sukanto</string>
+    <string name="time_placeholder">00:15</string>
 </resources>
