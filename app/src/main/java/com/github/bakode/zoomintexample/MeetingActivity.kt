@@ -2,13 +2,18 @@ package com.github.bakode.zoomintexample
 
 import android.annotation.SuppressLint
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.github.bakode.zoomintexample.utils.ZoomOption
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import us.zoom.sdk.*
+
 
 class MeetingActivity : AppCompatActivity(), View.OnTouchListener
 {
@@ -21,12 +26,36 @@ class MeetingActivity : AppCompatActivity(), View.OnTouchListener
         var secondaryVideoContainerXPos = 0f
         var secondaryVideoContainerYPos = 0f
         var secondaryVideoLastAction = 0
+
+        val videoAspect = ZoomVideoSDKVideoAspect.ZoomVideoSDKVideoAspect_Full_Filled
     }
 
+    @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_meeting)
+
+        val instance = ZoomVideoSDK.getInstance()
+
+        val joinSession = instance.joinSession(ZoomOption.zoomSessionCtx())
+        if (joinSession == null) {
+            Log.d(MainActivity.TAG, "NO ZOOM SESSION")
+            return
+        }
+
+        instance.session.mySelf.videoCanvas.let {
+            val customerCanvas = findViewById<ZoomVideoSDKVideoView>(R.id.secondaryVideoView)
+            customerCanvas.visibility = View.VISIBLE
+            it.subscribe(customerCanvas, videoAspect)
+        }
+
+        instance.session.remoteUsers.let {
+            Log.d(TAG, it.toString())
+        }
+
+        instance.videoHelper.rotateMyVideo(display?.rotation as Int)
+
     }
 
     override fun onStart()
@@ -105,10 +134,5 @@ class MeetingActivity : AppCompatActivity(), View.OnTouchListener
         }
 
         return true
-    }
-
-    override fun onDestroy()
-    {
-        super.onDestroy()
     }
 }

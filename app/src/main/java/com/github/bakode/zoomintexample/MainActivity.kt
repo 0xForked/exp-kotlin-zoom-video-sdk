@@ -97,12 +97,6 @@ class MainActivity : AppCompatActivity(), ZoomVideoSDKDelegate
         val sdkVersion = sdkInstance.sdkVersion
         Log.d(TAG, "ZOOM VIDEO SDK CONNECTED WITH CURRENT VERSION: $sdkVersion")
 
-        val joinSession = sdkInstance.joinSession(ZoomOption.zoomSessionCtx())
-        if (joinSession == null) {
-            Log.d(TAG, "NO ZOOM SESSION")
-            return
-        }
-
         // TODO ADD INTENT DATA/EXTRA
         startActivity(Intent(
             this,

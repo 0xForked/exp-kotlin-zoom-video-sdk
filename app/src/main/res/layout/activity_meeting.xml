@@ -14,7 +14,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-        <!-- TODO: ADD EXOPLAYER -->
+        <us.zoom.sdk.ZoomVideoSDKVideoView
+            android:id="@+id/primaryVideoView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:render_textureView="false"
+            android:visibility="gone">
+        </us.zoom.sdk.ZoomVideoSDKVideoView>
     </LinearLayout>
     <!-- PRIMARY VIDEO CONTAINER -->
 
@@ -29,7 +35,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:orientation="vertical">
-        <!-- TODO: ADD EXOPLAYER -->
+        <us.zoom.sdk.ZoomVideoSDKVideoView
+            android:id="@+id/secondaryVideoView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:render_textureView="false"
+            android:visibility="gone">
+        </us.zoom.sdk.ZoomVideoSDKVideoView>
     </LinearLayout>
     <!--  SECONDARY VIDEO CONTAINER  -->
 
