@@ -1,10 +1,12 @@
 package com.github.bakode.zoomintexample.utils
 
+import com.github.bakode.zoomintexample.App
+import com.github.bakode.zoomintexample.R
 import us.zoom.sdk.ZoomVideoSDKRawDataMemoryMode
 
 object Constants
 {
-    val WEB_DOMAIN = "https://zoom.us"
+    val WEB_DOMAIN = "zoom.us"
 
     val DEFAULT_MEMORY_MODE = ZoomVideoSDKRawDataMemoryMode.ZoomVideoSDKRawDataMemoryModeHeap
 
@@ -21,5 +23,5 @@ object Constants
      * "tokenExp": long // token expire time 1800
      * }
      */
-    val JWT_TOKEN = ""
+    val JWT_TOKEN = App.resourses.getString(R.string.zoom_jwt_token)
 }

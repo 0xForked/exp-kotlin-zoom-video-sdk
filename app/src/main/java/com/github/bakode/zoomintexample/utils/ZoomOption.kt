@@ -37,7 +37,7 @@ object ZoomOption {
             this.videoOption = zoomVideoOpts()
             this.token = Constants.JWT_TOKEN // TODO CHANGE THIS
             this.sessionIdleTimeoutMins = 10 // TODO CHANGE THIS
-            this.sessionName = "97862205099" // TODO CHANGE THIS
+            this.sessionName = "tpcName1" // TODO CHANGE THIS
             this.sessionPassword = "azBJQW1CTEZCY3BsVjZkZmNKR0tVZz09" // TODO CHANGE THIS
             this.userName = "Alpha Test" // TODO CHANGE THIS
         }
