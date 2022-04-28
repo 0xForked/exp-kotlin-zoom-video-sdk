@@ -1,8 +1,8 @@
-package com.github.bakode.zoomintexample.utils
+package com.github.bakode.zoomintexample
 
 import us.zoom.sdk.ZoomVideoSDKErrors.*
 
-object ErrorMessage {
+object ZoomErrorMessage {
     fun getMessageByCode(errorCode: Int): String {
         when (errorCode) {
             Errors_Wrong_Usage -> return "Incorrect use"

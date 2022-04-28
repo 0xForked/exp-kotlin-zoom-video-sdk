@@ -9,11 +9,9 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.github.bakode.zoomintexample.utils.ErrorMessage
-import com.github.bakode.zoomintexample.utils.ZoomOption
 import us.zoom.sdk.*
 
-class MainActivity : AppCompatActivity(), ZoomVideoSDKDelegate
+class MainActivity : AppCompatActivity()
 {
     companion object
     {
@@ -87,9 +85,9 @@ class MainActivity : AppCompatActivity(), ZoomVideoSDKDelegate
     {
         val sdkInstance = ZoomVideoSDK.getInstance()
 
-        val initSDK = sdkInstance.initialize(this, ZoomOption.zoomSDKParams())
+        val initSDK = sdkInstance.initialize(this, ZoomOptions.zoomSDKParams())
         if (initSDK != ZoomVideoSDKErrors.Errors_Success) {
-            val errorMessage = ErrorMessage.getMessageByCode(initSDK)
+            val errorMessage = ZoomErrorMessage.getMessageByCode(initSDK)
             Log.e(TAG, "SOMETHING WENT WRONG WHEN INITIALIZE ZOOM SDK: $errorMessage")
             return
         }
@@ -97,41 +95,6 @@ class MainActivity : AppCompatActivity(), ZoomVideoSDKDelegate
         val sdkVersion = sdkInstance.sdkVersion
         Log.d(TAG, "ZOOM VIDEO SDK CONNECTED WITH CURRENT VERSION: $sdkVersion")
 
-        // TODO ADD INTENT DATA/EXTRA
-        startActivity(Intent(
-            this,
-            MeetingActivity::class.java
-        ))
+        startActivity(Intent(this, ZoomMeetingActivity::class.java))
     }
-
-    override fun onError(errorCode: Int) {
-        Log.e(TAG, "SESSION ERROR: $errorCode")
-    }
-
-    override fun onSessionPasswordWrong(handler: ZoomVideoSDKPasswordHandler?) {
-        Log.e(TAG, "SESSION PASSWORD WRONG")
-    }
-
-    override fun onSessionJoin() { }
-    override fun onSessionLeave() {  }
-    override fun onUserJoin(userHelper: ZoomVideoSDKUserHelper?, userList: MutableList<ZoomVideoSDKUser>?) { }
-    override fun onUserLeave(userHelper: ZoomVideoSDKUserHelper?, userList: MutableList<ZoomVideoSDKUser>?) {}
-    override fun onUserVideoStatusChanged(videoHelper: ZoomVideoSDKVideoHelper?, userList: MutableList<ZoomVideoSDKUser>?) {}
-    override fun onUserAudioStatusChanged(audioHelper: ZoomVideoSDKAudioHelper?, userList: MutableList<ZoomVideoSDKUser>?) {}
-    override fun onUserShareStatusChanged(shareHelper: ZoomVideoSDKShareHelper?, userInfo: ZoomVideoSDKUser?, status: ZoomVideoSDKShareStatus?) {}
-    override fun onLiveStreamStatusChanged(liveStreamHelper: ZoomVideoSDKLiveStreamHelper?, status: ZoomVideoSDKLiveStreamStatus?) {}
-    override fun onChatNewMessageNotify(chatHelper: ZoomVideoSDKChatHelper?, messageItem: ZoomVideoSDKChatMessage?) {}
-    override fun onUserHostChanged(userHelper: ZoomVideoSDKUserHelper?, userInfo: ZoomVideoSDKUser?) {}
-    override fun onUserManagerChanged(user: ZoomVideoSDKUser?) {}
-    override fun onUserNameChanged(user: ZoomVideoSDKUser?) {}
-    override fun onUserActiveAudioChanged(audioHelper: ZoomVideoSDKAudioHelper?, list: MutableList<ZoomVideoSDKUser>?) {}
-    override fun onSessionNeedPassword(handler: ZoomVideoSDKPasswordHandler?) {}
-    override fun onMixedAudioRawDataReceived(rawData: ZoomVideoSDKAudioRawData?) {}
-    override fun onOneWayAudioRawDataReceived(rawData: ZoomVideoSDKAudioRawData?, user: ZoomVideoSDKUser?) {}
-    override fun onShareAudioRawDataReceived(rawData: ZoomVideoSDKAudioRawData?) {}
-    override fun onCommandReceived(sender: ZoomVideoSDKUser?, strCmd: String?) {}
-    override fun onCommandChannelConnectResult(isSuccess: Boolean) {}
-    override fun onCloudRecordingStatus(status: ZoomVideoSDKRecordingStatus?) {}
-    override fun onHostAskUnmute() {}
-    override fun onInviteByPhoneStatus(status: ZoomVideoSDKPhoneStatus?, reason: ZoomVideoSDKPhoneFailedReason?) {}
 }

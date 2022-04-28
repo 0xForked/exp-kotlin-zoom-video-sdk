@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MeetingActivity">
+    tools:context=".ZoomMeetingActivity">
 
     <!-- PRIMARY VIDEO CONTAINER -->
     <LinearLayout
@@ -57,7 +57,7 @@
         app:layout_constraintTop_toTopOf="parent">
         <TextView
             android:id="@+id/doctorName"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textStyle="normal"
