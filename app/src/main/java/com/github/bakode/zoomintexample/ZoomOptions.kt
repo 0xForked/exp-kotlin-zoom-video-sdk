@@ -5,7 +5,8 @@ import us.zoom.sdk.*
 object ZoomOptions {
     private const val WEB_DOMAIN = "zoom.us"
 
-    private val DEFAULT_MEMORY_MODE = ZoomVideoSDKRawDataMemoryMode.ZoomVideoSDKRawDataMemoryModeHeap
+    private val DEFAULT_MEMORY_MODE = ZoomVideoSDKRawDataMemoryMode
+        .ZoomVideoSDKRawDataMemoryModeHeap
 
     val zoomSDKParams: () -> ZoomVideoSDKInitParams = {
         ZoomVideoSDKInitParams().apply {

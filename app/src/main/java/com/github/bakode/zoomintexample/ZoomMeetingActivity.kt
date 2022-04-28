@@ -20,14 +20,13 @@ class ZoomMeetingActivity : AppCompatActivity(), View.OnTouchListener, ZoomVideo
     {
         val TAG: String = ZoomMeetingActivity::class.simpleName as String
 
-        var isMicrophoneMuted: Boolean = false
-
         var secondaryVideoContainerXPos = 0f
         var secondaryVideoContainerYPos = 0f
         var secondaryVideoLastAction = 0
     }
 
     private lateinit var zoomInstance: ZoomVideoSDK
+    private lateinit var remoteUser: ZoomVideoSDKUser
 
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?)
@@ -50,7 +49,8 @@ class ZoomMeetingActivity : AppCompatActivity(), View.OnTouchListener, ZoomVideo
             }
         }
 
-        this.zoomInstance.videoHelper.rotateMyVideo(display?.rotation as Int)
+        this.zoomInstance.videoHelper
+            .rotateMyVideo(display?.rotation as Int)
 
         this.zoomInstance.addListener(this)
     }
@@ -70,39 +70,13 @@ class ZoomMeetingActivity : AppCompatActivity(), View.OnTouchListener, ZoomVideo
             .setOnClickListener { view -> this.onMicrophoneMuted(view as FloatingActionButton) }
 
         findViewById<FloatingActionButton>(R.id.fabDismissMeeting)
-            .setOnClickListener { this.onMeetingDismissed() }
+            .setOnClickListener { this.finish() }
 
         findViewById<FloatingActionButton>(R.id.fabSwitchVideoFrame)
             .setOnClickListener { this.onVideoFrameSwitched() }
 
         findViewById<View>(R.id.secondaryVideoContainer)
             .setOnTouchListener(this)
-    }
-
-    private fun onMicrophoneMuted(view: FloatingActionButton)
-    {
-        isMicrophoneMuted = !isMicrophoneMuted
-
-        val micOnIcon = ContextCompat.getDrawable(
-            this, R.drawable.ic_baseline_mic_none)
-        val micOffIcon = ContextCompat.getDrawable(
-            this, R.drawable.ic_baseline_mic_off)
-        val getMicrophoneStatusIcon: () -> Drawable = {
-            if (isMicrophoneMuted) micOnIcon as Drawable
-            else micOffIcon as Drawable
-        }
-
-        view.setImageDrawable(getMicrophoneStatusIcon())
-    }
-
-    private fun onMeetingDismissed()
-    {
-        Log.d(TAG, "CALL_DISMISSED")
-    }
-
-    private fun onVideoFrameSwitched()
-    {
-        Log.d(TAG, "FRAME_SWITCHED")
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -133,16 +107,48 @@ class ZoomMeetingActivity : AppCompatActivity(), View.OnTouchListener, ZoomVideo
         return true
     }
 
-    override fun onError(errorCode: Int) {
-        Log.d(TAG, "ON_ERROR $errorCode")
+    private fun onMicrophoneMuted(view: FloatingActionButton)
+    {
+        val customer = this.zoomInstance.session.mySelf
+
+        val isMuted = customer.audioStatus.isMuted
+        val audioHelper = this.zoomInstance.audioHelper
+        if (!isMuted) audioHelper.muteAudio(customer)
+        else audioHelper.unMuteAudio(customer)
+
+        view.setImageDrawable(getMicrophoneStatusIcon(isMuted))
     }
 
-    override fun onSessionJoin() {
-        Log.d(TAG, "onSessionJoin")
+    private fun getMicrophoneStatusIcon(isMuted: Boolean): Drawable
+    {
+        val iconOn = ContextCompat.getDrawable(
+            this, R.drawable.ic_baseline_mic_none)
+        val iconOff = ContextCompat.getDrawable(
+            this, R.drawable.ic_baseline_mic_off)
+
+        return if (isMuted) iconOn as Drawable
+        else iconOff as Drawable
     }
 
-    override fun onSessionLeave() {
-        Log.d(TAG, "onSessionLeave")
+    private fun onVideoFrameSwitched()
+    {
+        this.zoomInstance.videoHelper.switchCamera()
+    }
+
+    private fun setupVideoFrame()
+    {
+        findViewById<TextView>(R.id.doctorName).text = this.remoteUser.userName
+        val primaryVideoView = findViewById<ZoomVideoSDKVideoView>(R.id.primaryVideoView)
+        val secondaryVideoView = findViewById<ZoomVideoSDKVideoView>(R.id.secondaryVideoView)
+
+        primaryVideoView.visibility = View.VISIBLE
+        secondaryVideoView.visibility = View.VISIBLE
+
+        val originalRatio = ZoomVideoSDKVideoAspect.ZoomVideoSDKVideoAspect_Original
+        val fullFilledRatio = ZoomVideoSDKVideoAspect.ZoomVideoSDKVideoAspect_Full_Filled
+        this.remoteUser.videoCanvas.subscribe(primaryVideoView, originalRatio)
+        this.zoomInstance.session.mySelf.videoCanvas
+            .subscribe(secondaryVideoView, fullFilledRatio)
     }
 
     override fun onUserJoin(
@@ -150,75 +156,25 @@ class ZoomMeetingActivity : AppCompatActivity(), View.OnTouchListener, ZoomVideo
         userList: MutableList<ZoomVideoSDKUser>?
     ) {
         if (userList != null) {
-            findViewById<TextView>(R.id.doctorName).text = userList[0].userName
-            userList[0].videoCanvas.let { canvas ->
-                val doctorCanvas = findViewById<ZoomVideoSDKVideoView>(R.id.primaryVideoView)
-                doctorCanvas.visibility = View.VISIBLE
-                val videoAspect = ZoomVideoSDKVideoAspect.ZoomVideoSDKVideoAspect_Original
-                canvas.subscribe(doctorCanvas, videoAspect)
-            }
-        }
-
-        // userList?.forEach { user ->
-        //     if (user.userName.toString()  == "Chrome-298") {
-        //         findViewById<TextView>(R.id.doctorName).text = user.userName
-        //         user.videoCanvas.let { canvas ->
-        //             val doctorCanvas = findViewById<ZoomVideoSDKVideoView>(R.id.primaryVideoView)
-        //             doctorCanvas.visibility = View.VISIBLE
-        //             val videoAspect = ZoomVideoSDKVideoAspect.ZoomVideoSDKVideoAspect_Original
-        //             canvas.subscribe(doctorCanvas, videoAspect)
-        //         }
-        //     }
-        // }
-
-        this.zoomInstance.session.mySelf.videoCanvas.let {
-            val customerCanvas = findViewById<ZoomVideoSDKVideoView>(R.id.secondaryVideoView)
-            customerCanvas.visibility = View.VISIBLE
-            val videoAspect = ZoomVideoSDKVideoAspect.ZoomVideoSDKVideoAspect_Full_Filled
-            it.subscribe(customerCanvas, videoAspect)
+            this.remoteUser = userList[0]
+            this.setupVideoFrame()
         }
     }
 
-    override fun onUserVideoStatusChanged(
-        videoHelper: ZoomVideoSDKVideoHelper?,
-        userList: MutableList<ZoomVideoSDKUser>?
-    ) {
-        Log.d(TAG, "onUserVideoStatusChanged")
+    override fun onError(errorCode: Int)
+    {
+        Log.d(TAG, "ON_ERROR $errorCode")
     }
 
-    override fun onUserAudioStatusChanged(
-        audioHelper: ZoomVideoSDKAudioHelper?,
-        userList: MutableList<ZoomVideoSDKUser>?
-    ) {
-        Log.d(TAG, "onUserAudioStatusChanged")
-    }
 
-    override fun onUserActiveAudioChanged(
-        audioHelper: ZoomVideoSDKAudioHelper?,
-        list: MutableList<ZoomVideoSDKUser>?
-    ) {
-        Log.d(TAG, "onUserActiveAudioChanged")
-    }
-
-    override fun onMixedAudioRawDataReceived(rawData: ZoomVideoSDKAudioRawData?) {
-        Log.d(TAG, "onMixedAudioRawDataReceived")
-    }
-
-    override fun onOneWayAudioRawDataReceived(
-        rawData: ZoomVideoSDKAudioRawData?,
-        user: ZoomVideoSDKUser?
-    ) {
-        Log.d(TAG, "onOneWayAudioRawDataReceived")
-    }
-
-    override fun onShareAudioRawDataReceived(rawData: ZoomVideoSDKAudioRawData?) {
-        Log.d(TAG, "onShareAudioRawDataReceived")
-    }
-
-    override fun onHostAskUnmute() {
-        Log.d(TAG, "onHostAskUnmute")
-    }
-
+    // =============================================================================================
+    override fun onUserVideoStatusChanged(videoHelper: ZoomVideoSDKVideoHelper?, userList: MutableList<ZoomVideoSDKUser>?) {}
+    override fun onUserAudioStatusChanged(audioHelper: ZoomVideoSDKAudioHelper?, userList: MutableList<ZoomVideoSDKUser>?) { }
+    override fun onUserActiveAudioChanged(audioHelper: ZoomVideoSDKAudioHelper?, list: MutableList<ZoomVideoSDKUser>?) {}
+    override fun onMixedAudioRawDataReceived(rawData: ZoomVideoSDKAudioRawData?) { }
+    override fun onOneWayAudioRawDataReceived(rawData: ZoomVideoSDKAudioRawData?, user: ZoomVideoSDKUser?) {}
+    override fun onShareAudioRawDataReceived(rawData: ZoomVideoSDKAudioRawData?) {}
+    override fun onHostAskUnmute() {}
     override fun onUserLeave(userHelper: ZoomVideoSDKUserHelper?, userList: MutableList<ZoomVideoSDKUser>?) {}
     override fun onUserShareStatusChanged(shareHelper: ZoomVideoSDKShareHelper?, userInfo: ZoomVideoSDKUser?, status: ZoomVideoSDKShareStatus?) {}
     override fun onLiveStreamStatusChanged(liveStreamHelper: ZoomVideoSDKLiveStreamHelper?, status: ZoomVideoSDKLiveStreamStatus?) { }
@@ -232,4 +188,14 @@ class ZoomMeetingActivity : AppCompatActivity(), View.OnTouchListener, ZoomVideo
     override fun onCommandChannelConnectResult(isSuccess: Boolean) {}
     override fun onCloudRecordingStatus(status: ZoomVideoSDKRecordingStatus?) {}
     override fun onInviteByPhoneStatus(status: ZoomVideoSDKPhoneStatus?, reason: ZoomVideoSDKPhoneFailedReason?) {}
+    override fun onSessionLeave() {}
+    override fun onSessionJoin() {}
+    // =============================================================================================
+
+
+    override fun onDestroy()
+    {
+        super.onDestroy()
+        zoomInstance.leaveSession(false)
+    }
 }
